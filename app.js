@@ -1,20 +1,9 @@
 const DB = require("./data/connection");
-const figlet = require("figlet")
+const figlet = require("./figlet.js");
 
-function writeText () {
-    figlet('Employee Tracker!!', {
-        horizontalLayout: 'full',
-    },function(err, data) {
-        if (err) {
-            console.log('Something went wrong...');
-            console.dir(err);
-            return;
-        }
-        console.log(data)
-    });
-};
+// Display project title
+figlet.writeText();
 
-writeText();
 // DB.createEmployee(850, "Johnny", "Bravo", 8, 202);
 // DB.createDepartment(8,"Europe");
 // DB.createRole(8,"Janitor", 25000.00, 8)
