@@ -13,6 +13,7 @@ const connection = mysql.createConnection({
 const connectAsync = util.promisify(connection.connect).bind(connection);
 const queryAsync = util.promisify(connection.query).bind(connection);
 // figlet.writeText();
+
 const actions = {
 	addEmployee: async function (q) {
 		try {
@@ -58,18 +59,35 @@ const actions = {
 					]
 				}];
 			const { id, firstName, lastName, role, manager } = await prompt(questions);
-			q("INSERT INTO employee SET ?",{id: id, first_name: firstName, last_name: lastName, role_id: role, manager_id: manager},
-			// 	function(err, res) {
-			// 		if (err) throw err;
-			// 		console.log(res.affectedRows + " employee inserted!\n");
-			// 		// Call updateProduct AFTER the INSERT completes
-			// 		connection.end();
-			// }
-			);
+			q("INSERT INTO employee SET ?",{id: id, first_name: firstName, last_name: lastName, role_id: role, manager_id: manager});
 		} catch (err) {
 			throw err;
 		}
 	},
+	removeEmployee: async function (q) {
+		try{
+			const questions = {
+				name: "id",
+				type: "input",
+				message: "enter the employees id."
+			}
+			const { id } = await prompt(questions);
+			q("DELETE FROM employee WHERE ?",{ id: id,});
+		} catch (err) {
+			throw err;
+		}
+	},
+	allEmployees: async function(q) {
+		const employees = await q("SELECT * FROM employee");
+		console.table("All Employees", employees);
+	},
+	// allEmployees: async function(q) {
+	// 	q("SELECT * FROM employee", function(err,res) {
+	// 		if(err) throw err;
+	// 		// log all results of the SELECT statement
+	// 		console.table("All Employees", res);
+	// 	});
+	// },
 }
 
 
