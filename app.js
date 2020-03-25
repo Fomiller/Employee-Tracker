@@ -20,19 +20,20 @@ const actions = {
 		return departments.map(dept => dept.name);
 	},
 	generateManagers: async function (q) {
-		const managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title = \"Manager\"");
+		const managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title LIKE ?", ['%manager%']);
 		// const test = managers.map(manager => manager.id + manager.first_name + " " + manager.last_name );
-		var managerValues = managers.map(manager => {
+		var managerValues = await managers.map(manager => {
 			const managerContainer = {};
 			managerContainer.value = manager.id;
 			managerContainer.name = manager.first_name + " " + manager.last_name;	
 			return managerContainer;
 		});
+		// console.log("VALUES: ", managerValues);
 		return managerValues;
 	},
 	generateRoles: async function (q) {
 		const roles = await q("SELECT * FROM role")
-		var roleValues = roles.map(role => {
+		var roleValues = await roles.map(role => {
 			const roleContainer = {};
 			roleContainer.value = role.id;
 			roleContainer.name = role.title;	
@@ -61,12 +62,12 @@ const actions = {
 					message: "What is this employees role?",
 					choices: roleList
 				},
-				// {
-				// 	name: "manager",
-				// 	type: "list",
-				// 	message: "Who is their manager?",
-				// 	choices: managerList
-				// }
+				{
+					name: "manager",
+					type: "list",
+					message: "Who is their manager?",
+					choices: managerList
+				}
 			];
 			const { firstName, lastName, role, manager,} = await prompt(questions);
 			const { name: role_title } = await roleList.find(o => o.value === role);
