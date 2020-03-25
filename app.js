@@ -146,14 +146,16 @@ const actions = {
 		}
 	},
 	removeDepartment: async function (q) {
+		var departmentList = await this.generateDepartments(q);
 		try{
 			const questions = {
 				name: "department",
-				type: "input",
-				message: "enter the name of the department."
+				type: "list",
+				message: "Which department would you like to remove?",
+				choices: departmentList
 			}
 			const { department } = await prompt(questions);
-			q("DELETE FROM department WHERE ?",{name: department});
+			q("DELETE FROM department WHERE ?",{id: department});
 		} catch (err) {
 			throw err;
 		};
