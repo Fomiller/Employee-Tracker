@@ -15,6 +15,10 @@ const queryAsync = util.promisify(connection.query).bind(connection);
 // figlet.writeText();
 
 const actions = {
+	generateDepartments: async function (q){
+		const departments = await q("SELECT name FROM department");
+		return departments.map(dept => dept.name);
+	},
 	addEmployee: async function (q) {
 		try {
 			const questions = [
@@ -81,21 +85,7 @@ const actions = {
 		const employees = await q("SELECT * FROM employee");
 		console.table("All Employees", employees);
 	},
-	// allEmployees: async function(q) {
-	// 	q("SELECT * FROM employee", function(err,res) {
-	// 		if(err) throw err;
-	// 		// log all results of the SELECT statement
-	// 		console.table("All Employees", res);
-	// 	});
-	// },
 }
-
-
-
-
-
-
-
 
 
 async function init() {
@@ -127,12 +117,13 @@ async function runApp(query) {
 		await actions[input](query)
 		runApp(query);
 	} catch (err) {
-	throw err;
+		throw err;
 	}
 };
 
+// actions.generateDepartments(queryAsync);
 
-init();
+// init();
 
 
 
