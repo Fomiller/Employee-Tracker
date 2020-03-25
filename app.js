@@ -131,14 +131,16 @@ const actions = {
 		}
 	},
 	removeEmployee: async function (q) {
+		var employeeList = await this.generateEmployees(q);
 		try{
 			const questions = {
-				name: "id",
-				type: "input",
-				message: "enter the employees id."
+				name: "employee",
+				type: "list",
+				message: "Which employee would you like to remove?",
+				choices: employeeList
 			}
-			const { id } = await prompt(questions);
-			q("DELETE FROM employee WHERE ?",{ id: id,});
+			const { employee } = await prompt(questions);
+			q("DELETE FROM employee WHERE ?",{ id: employee});
 		} catch (err) {
 			throw err;
 		}
@@ -227,6 +229,6 @@ async function runApp(query) {
 
 // actions.generateRoles(queryAsync);
 // actions.generateManagers(queryAsync);
-actions.generateEmployees(queryAsync);
+// actions.generateEmployees(queryAsync);
 
-// init();
+init();
