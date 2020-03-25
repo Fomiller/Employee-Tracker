@@ -44,7 +44,6 @@ const actions = {
 		const roleList = await this.generateRoles(q);
 		const managerList = await this.generateManagers(q);
 		try {
-			// console.log(managerList);
 			const questions = [
 				{
 					name: "firstName",
@@ -70,8 +69,6 @@ const actions = {
 				// }
 			];
 			const { firstName, lastName, role, manager,} = await prompt(questions);
-			// deconstruct name from roleList, as to not repeat code
-			// const roleTitles = await this.generateRoles(q);
 			const { name: role_title } = await roleList.find(o => o.value === role);
 			q("INSERT INTO employee SET ?",{first_name: firstName, last_name: lastName, role_title: role_title, role_id: role, manager_id: manager});
 		} catch (err) {
@@ -95,6 +92,14 @@ const actions = {
 		const employees = await q("SELECT * FROM employee");
 		console.table("All Employees", employees);
 	},
+	allDepartments: async function(q) {
+		const departments = await q("SELECT * FROM department");
+		console.table("All Departments", departments);
+	},
+	allRoles: async function(q) {
+		const roles = await q("SELECT * FROM role");
+		console.table("All Roles", roles);
+	},
 }
 
 
@@ -117,6 +122,8 @@ async function runApp(query) {
 			message: "What would you like to do?",
 			choices: [
 				{value: 'allEmployees', name: "View all employees."},
+				{value: 'allDepartments', name: "View all departments."},
+				{value: 'allRoles', name: "View all roles."},
 				{value: 'empByDepartment', name: "View employees by department."},
 				{value: 'empByManager', name: "View all employees by manager."},
 				{value: 'addEmployee', name: "Add employee."},
