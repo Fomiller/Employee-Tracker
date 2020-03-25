@@ -16,19 +16,23 @@ const queryAsync = util.promisify(connection.query).bind(connection);
 
 const actions = {
 	generateDepartments: async function (q) {
-		const departments = await q("SELECT name FROM department");
-		return departments.map(dept => dept.name);
+		const departments = await q("SELECT * FROM department");
+		var departmentValues = await departments.map(department => {
+			const departmentContainer = {};
+			departmentContainer.value = department.id;
+			departmentContainer.name = department.name;	
+			return departmentContainer;
+		});
+		return departmentValues;
 	},
 	generateManagers: async function (q) {
 		const managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title LIKE ?", ['%manager%']);
-		// const test = managers.map(manager => manager.id + manager.first_name + " " + manager.last_name );
 		var managerValues = await managers.map(manager => {
 			const managerContainer = {};
 			managerContainer.value = manager.id;
 			managerContainer.name = manager.first_name + " " + manager.last_name;	
 			return managerContainer;
 		});
-		// console.log("VALUES: ", managerValues);
 		return managerValues;
 	},
 	generateRoles: async function (q) {
@@ -76,6 +80,46 @@ const actions = {
 			throw err;
 		}
 	},
+	addDepartment: async function (q) {
+		try{
+			const questions = {
+				name: "department",
+				type: "input",
+				message: "enter the name of the Department."
+			}
+			const { department } = await prompt(questions);
+			q("INSERT INTO department SET ?",{name: department});
+		} catch (err) {
+			throw err;
+		}
+	},
+	addRole: async function (q) {
+		const departmentList = await this.generateDepartments(q);
+		try{
+			const questions = [
+				{
+				name: "title",
+				type: "input",
+				message: "enter the name of the Role."
+				},
+				{
+				name: "salary",
+				type: "input",
+				message: "What is the salary of this position."
+				},
+				{
+				name: "department",
+				type: "list",
+				message: "which department do does this role work for?",
+				choices: departmentList
+				},
+			]
+			const { title, salary, department } = await prompt(questions);
+			q("INSERT INTO role SET ?",{title: title, salary: salary, department_id: department});
+		} catch (err) {
+			throw err;
+		}
+	},
 	removeEmployee: async function (q) {
 		try{
 			const questions = {
@@ -88,6 +132,32 @@ const actions = {
 		} catch (err) {
 			throw err;
 		}
+	},
+	removeDepartment: async function (q) {
+		try{
+			const questions = {
+				name: "department",
+				type: "input",
+				message: "enter the name of the department."
+			}
+			const { department } = await prompt(questions);
+			q("DELETE FROM department WHERE ?",{name: department});
+		} catch (err) {
+			throw err;
+		};
+	},
+	removeRole: async function (q) {
+		try{
+			const questions = {
+				name: "role",
+				type: "input",
+				message: "enter the name of the department."
+			}
+			const { role } = await prompt(questions);
+			q("DELETE FROM role WHERE ?",[role]);
+		} catch (err) {
+			throw err;
+		};
 	},
 	allEmployees: async function(q) {
 		const employees = await q("SELECT * FROM employee");
@@ -102,9 +172,6 @@ const actions = {
 		console.table("All Roles", roles);
 	},
 }
-
-
-
 
 async function init() {
 	try{
@@ -128,7 +195,11 @@ async function runApp(query) {
 				{value: 'empByDepartment', name: "View employees by department."},
 				{value: 'empByManager', name: "View all employees by manager."},
 				{value: 'addEmployee', name: "Add employee."},
+				{value: 'addDepartment', name: "Add department."},
+				{value: 'addRole', name: "Add role."},
 				{value: 'removeEmployee', name: "Remove employee."},
+				{value: 'removeDepartment', name: "Remove department."},
+				{value: 'removeRole', name: "Remove role."},
 				{value: 'updateRole', name: "Update an employees role."},
 				{value: 'updateManager', name: "Update an employees manager."},
 			]
@@ -144,5 +215,6 @@ async function runApp(query) {
 
 // actions.generateRoles(queryAsync);
 // actions.generateManagers(queryAsync);
+// actions.generateDepartments(queryAsync);
 
 init();
