@@ -45,6 +45,16 @@ const actions = {
 		});
 		return roleValues;
 	},
+	generateEmployees: async function (q) {
+		var employees = await q("SELECT * FROM employee")
+		var employeeValues = await employees.map(employee => {
+			const employeeContainer = {};
+			employeeContainer.value = employee.id;
+			employeeContainer.name = employee.first_name + " " + employee.last_name;	
+			return employeeContainer;
+		});
+		return employeeValues;
+	},
 	addEmployee: async function (q) {
 		var roleList = await this.generateRoles(q);
 		var managerList = await this.generateManagers(q);
@@ -217,6 +227,6 @@ async function runApp(query) {
 
 // actions.generateRoles(queryAsync);
 // actions.generateManagers(queryAsync);
-// actions.generateDepartments(queryAsync);
+actions.generateEmployees(queryAsync);
 
-init();
+// init();
