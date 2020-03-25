@@ -15,18 +15,37 @@ const queryAsync = util.promisify(connection.query).bind(connection);
 // figlet.writeText();
 
 const actions = {
-	generateDepartments: async function (q){
+	generateDepartments: async function (q) {
 		const departments = await q("SELECT name FROM department");
 		return departments.map(dept => dept.name);
 	},
+	generateManagers: async function (q) {
+		const managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title = \"Manager\"");
+		// const test = managers.map(manager => manager.id + manager.first_name + " " + manager.last_name );
+		var managerValues = managers.map(manager => {
+			const managerContainer = {};
+			managerContainer.value = manager.id;
+			managerContainer.name = manager.first_name + " " + manager.last_name;	
+			return managerContainer;
+		});
+		return managerValues;
+	},
+	generateRoles: async function (q) {
+		const roles = await q("SELECT * FROM role")
+		var roleValues = roles.map(role => {
+			const roleContainer = {};
+			roleContainer.value = role.id;
+			roleContainer.name = role.title;	
+			return roleContainer;
+		});
+		return roleValues;
+	},
 	addEmployee: async function (q) {
+		const roleList = await this.generateRoles(q);
+		const managerList = await this.generateManagers(q);
 		try {
+			// console.log(managerList);
 			const questions = [
-				{
-					name: "id",
-					type: "input",
-					message: "Enter employees id number.", 
-				},
 				{
 					name: "firstName",
 					type: "input",
@@ -41,29 +60,19 @@ const actions = {
 					name: "role",
 					type: "list",
 					message: "What is this employees role?",
-					choices: [
-						{value: "11", name: "Manager"},
-						{value: "21", name: "Engineer"},
-						{value: "22", name: "Marketing"},
-						{value: "51", name: "Intern"},
-						{value: "8", name: "Janitor"},
-					]
+					choices: roleList
 				},
-				{
-					name: "manager",
-					type: "list",
-					message: "who is their manager?",
-					// loop of all managers...
-					choices: [
-						{value: "101", name: "Stephen"},
-						{value: "102", name: "Ryan"},
-						{value: "103", name: "Emil"},
-						{value: "201", name: "Tom"},
-						{value: "203", name: "Joe"},
-					]
-				}];
-			const { id, firstName, lastName, role, manager } = await prompt(questions);
-			q("INSERT INTO employee SET ?",{id: id, first_name: firstName, last_name: lastName, role_id: role, manager_id: manager});
+				// {
+				// 	name: "manager",
+				// 	type: "list",
+				// 	message: "Who is their manager?",
+				// 	choices: managerList
+				// }
+			];
+			const { firstName, lastName, role, manager,} = await prompt(questions);
+			const roleTitles = await this.generateRoles(q);
+			const { name: role_title } = await roleTitles.find(o => o.value === role);
+			q("INSERT INTO employee SET ?",{first_name: firstName, last_name: lastName, role_title: role_title, role_id: role, manager_id: manager});
 		} catch (err) {
 			throw err;
 		}
@@ -86,6 +95,8 @@ const actions = {
 		console.table("All Employees", employees);
 	},
 }
+
+
 
 
 async function init() {
@@ -121,43 +132,8 @@ async function runApp(query) {
 	}
 };
 
-// actions.generateDepartments(queryAsync);
 
-// init();
+// actions.generateRoles(queryAsync);
+// actions.generateManagers(queryAsync);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Display project title
-
-// DB.createEmployee(850, "Johnny", "Bravo", 8, 202);
-// DB.createDepartment(8,"Europe");
-// DB.createRole(8,"Janitor", 25000.00, 8)
-// DB.deleteEmployee("Johnny");
-
-// DB.updateRole(4, "Johnny");
-
-// DB.readDepartment();
-// DB.readRole();
-// DB.readEmployee();
-
-// console.log(DB);
+init();
