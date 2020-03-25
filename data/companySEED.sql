@@ -1,14 +1,14 @@
-DELETE FROM employee;
-DELETE FROM department;
-DELETE FROM role;
+-- DELETE FROM employee;
+-- DELETE FROM department;
+-- DELETE FROM role;
 
 USE company_db;
 -- Creating all Departments.
 -- Create this first because it does not have any foreign keys
-INSERT INTO department VALUES (1, 'Corporate');
-INSERT INTO department VALUES (2, 'Engineering');
-INSERT INTO department VALUES (3, 'Marketing');
-INSERT INTO department VALUES (4, 'I.T.');
+INSERT INTO department (name) VALUES ('Corporate');
+INSERT INTO department (name) VALUES ('Engineering');
+INSERT INTO department (name) VALUES ('Marketing');
+INSERT INTO department (name) VALUES ('I.T.');
 
 -- ==========================================================================
 -- Create Roles second because they depend on Departments for foreign keys.
