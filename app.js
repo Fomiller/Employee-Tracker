@@ -26,7 +26,7 @@ const actions = {
 		return departmentValues;
 	},
 	generateManagers: async function (q) {
-		const managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title LIKE ?", ['%manager%']);
+		var managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title LIKE ?", ['%manager%']);
 		var managerValues = await managers.map(manager => {
 			const managerContainer = {};
 			managerContainer.value = manager.id;
@@ -36,7 +36,7 @@ const actions = {
 		return managerValues;
 	},
 	generateRoles: async function (q) {
-		const roles = await q("SELECT * FROM role")
+		var roles = await q("SELECT * FROM role")
 		var roleValues = await roles.map(role => {
 			const roleContainer = {};
 			roleContainer.value = role.id;
@@ -46,8 +46,8 @@ const actions = {
 		return roleValues;
 	},
 	addEmployee: async function (q) {
-		const roleList = await this.generateRoles(q);
-		const managerList = await this.generateManagers(q);
+		var roleList = await this.generateRoles(q);
+		var managerList = await this.generateManagers(q);
 		try {
 			const questions = [
 				{
@@ -94,7 +94,7 @@ const actions = {
 		}
 	},
 	addRole: async function (q) {
-		const departmentList = await this.generateDepartments(q);
+		var departmentList = await this.generateDepartments(q);
 		try{
 			const questions = [
 				{
@@ -147,14 +147,16 @@ const actions = {
 		};
 	},
 	removeRole: async function (q) {
+		var roleList = await this.generateRoles(q);
 		try{
 			const questions = {
 				name: "role",
-				type: "input",
-				message: "enter the name of the department."
+				type: "list",
+				message: "Which role would you like to remove?",
+				choices: roleList
 			}
 			const { role } = await prompt(questions);
-			q("DELETE FROM role WHERE ?",[role]);
+			q("DELETE FROM role WHERE ?",{id: role});
 		} catch (err) {
 			throw err;
 		};
