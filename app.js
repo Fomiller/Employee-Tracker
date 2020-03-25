@@ -70,8 +70,9 @@ const actions = {
 				// }
 			];
 			const { firstName, lastName, role, manager,} = await prompt(questions);
-			const roleTitles = await this.generateRoles(q);
-			const { name: role_title } = await roleTitles.find(o => o.value === role);
+			// deconstruct name from roleList, as to not repeat code
+			// const roleTitles = await this.generateRoles(q);
+			const { name: role_title } = await roleList.find(o => o.value === role);
 			q("INSERT INTO employee SET ?",{first_name: firstName, last_name: lastName, role_title: role_title, role_id: role, manager_id: manager});
 		} catch (err) {
 			throw err;
