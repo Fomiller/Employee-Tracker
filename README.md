@@ -1,10 +1,11 @@
 
 # Employee Tracker
-![Commits](https://img.shields.io/github/last-commit/Fomiller/https://github.com/Fomiller/Employee-Tracker)  
+ 
 ## Languages
 ![JavaScript](https://img.shields.io/badge/language-JavaScript-orange)&ensp;![Node.js](https://img.shields.io/badge/language-Node.js-brightgreen)&ensp;
 ## Description
 Employee Tracker is a CLI database management tool that easily allows the user to create employees, departments and roles within a company. The user can manage employees by changing their role and their assigned mangager within Employee Tracker.
+![Employee Tracker](Assets/allEmployees.PNG)
 
 ## Table of Contents
 * [Installation](#Installation)
@@ -16,6 +17,7 @@ Employee Tracker is a CLI database management tool that easily allows the user t
 
 ## Installation
 RUN npm install from the root folder.
+![Hot Restaurant Image](Assets/npmStart.PNG)
 
 ## Usage
 Once the user has started the application they will be able to scroll through a list of prompts that will give them to ability to create and remove employees, roles, and departments.
