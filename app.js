@@ -1,5 +1,5 @@
-const DB = require("./data/connection");
 var mysql = require("mysql");
+const cTable = require("console.table");
 const figlet = require("./figlet.js");
 const { prompt } = require("inquirer");
 const util = require("util");
@@ -10,19 +10,24 @@ const connection = mysql.createConnection({
     password: "527996",
     database: "company_db"
 });
+
 const connectAsync = util.promisify(connection.connect).bind(connection);
 const queryAsync = util.promisify(connection.query).bind(connection);
 // figlet.writeText();
-
 const actions = {
 	generateDepartments: async function (q) {
-		const departments = await q("SELECT name FROM department");
-		return departments.map(dept => dept.name);
+		const departments = await q("SELECT * FROM department");
+		var departmentValues = await departments.map(department => {
+			const departmentContainer = {};
+			departmentContainer.value = department.id;
+			departmentContainer.name = department.name;	
+			return departmentContainer;
+		});
+		return departmentValues;
 	},
 	generateManagers: async function (q) {
-		const managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title = \"Manager\"");
-		// const test = managers.map(manager => manager.id + manager.first_name + " " + manager.last_name );
-		var managerValues = managers.map(manager => {
+		var managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title LIKE ? OR role_title LIKE ?", ['%manager%', '%CEO%']);
+		var managerValues = await managers.map(manager => {
 			const managerContainer = {};
 			managerContainer.value = manager.id;
 			managerContainer.name = manager.first_name + " " + manager.last_name;	
@@ -31,8 +36,8 @@ const actions = {
 		return managerValues;
 	},
 	generateRoles: async function (q) {
-		const roles = await q("SELECT * FROM role")
-		var roleValues = roles.map(role => {
+		var roles = await q("SELECT * FROM role")
+		var roleValues = await roles.map(role => {
 			const roleContainer = {};
 			roleContainer.value = role.id;
 			roleContainer.name = role.title;	
@@ -40,11 +45,20 @@ const actions = {
 		});
 		return roleValues;
 	},
+	generateEmployees: async function (q) {
+		var employees = await q("SELECT * FROM employee")
+		var employeeValues = await employees.map(employee => {
+			const employeeContainer = {};
+			employeeContainer.value = employee.id;
+			employeeContainer.name = employee.first_name + " " + employee.last_name;	
+			return employeeContainer;
+		});
+		return employeeValues;
+	},
 	addEmployee: async function (q) {
-		const roleList = await this.generateRoles(q);
-		const managerList = await this.generateManagers(q);
+		var roleList = await this.generateRoles(q);
+		var managerList = await this.generateManagers(q);
 		try {
-			// console.log(managerList);
 			const questions = [
 				{
 					name: "firstName",
@@ -62,42 +76,174 @@ const actions = {
 					message: "What is this employees role?",
 					choices: roleList
 				},
-				// {
-				// 	name: "manager",
-				// 	type: "list",
-				// 	message: "Who is their manager?",
-				// 	choices: managerList
-				// }
+				{
+					name: "manager",
+					type: "list",
+					message: "Who is their manager?",
+					choices: managerList
+				}
 			];
+			// deconstruct answers from inquirer
 			const { firstName, lastName, role, manager,} = await prompt(questions);
-			const roleTitles = await this.generateRoles(q);
-			const { name: role_title } = await roleTitles.find(o => o.value === role);
+			// .find() the matching name to role and pass to the employee
+			const { name: role_title } = await roleList.find(o => o.value === role);
 			q("INSERT INTO employee SET ?",{first_name: firstName, last_name: lastName, role_title: role_title, role_id: role, manager_id: manager});
 		} catch (err) {
 			throw err;
-		}
+		};
 	},
-	removeEmployee: async function (q) {
+	addDepartment: async function (q) {
 		try{
 			const questions = {
-				name: "id",
+				name: "department",
 				type: "input",
-				message: "enter the employees id."
+				message: "enter the name of the Department."
 			}
-			const { id } = await prompt(questions);
-			q("DELETE FROM employee WHERE ?",{ id: id,});
+			const { department } = await prompt(questions);
+			q("INSERT INTO department SET ?",{name: department});
 		} catch (err) {
 			throw err;
-		}
+		};
+	},
+	addRole: async function (q) {
+		var departmentList = await this.generateDepartments(q);
+		try{
+			const questions = [
+				{
+				name: "title",
+				type: "input",
+				message: "enter the name of the Role."
+				},
+				{
+				name: "salary",
+				type: "input",
+				message: "What is the salary of this position."
+				},
+				{
+				name: "department",
+				type: "list",
+				message: "which department do does this role work for?",
+				choices: departmentList
+				},
+			]
+			const { title, salary, department } = await prompt(questions);
+			q("INSERT INTO role SET ?",{title: title, salary: salary, department_id: department});
+		} catch (err) {
+			throw err;
+		};
+	},
+	removeEmployee: async function (q) {
+		var employeeList = await this.generateEmployees(q);
+		try{
+			const questions = {
+				name: "employee",
+				type: "list",
+				message: "Which employee would you like to remove?",
+				choices: employeeList
+			}
+			const { employee } = await prompt(questions);
+			q("DELETE FROM employee WHERE ?",{ id: employee});
+		} catch (err) {
+			throw err;
+		};
+	},
+	removeDepartment: async function (q) {
+		var departmentList = await this.generateDepartments(q);
+		try{
+			const questions = {
+				name: "department",
+				type: "list",
+				message: "Which department would you like to remove?",
+				choices: departmentList
+			}
+			const { department } = await prompt(questions);
+			q("DELETE FROM department WHERE ?",{id: department});
+		} catch (err) {
+			throw err;
+		};
+	},
+	removeRole: async function (q) {
+		var roleList = await this.generateRoles(q);
+		try{
+			const questions = {
+				name: "role",
+				type: "list",
+				message: "Which role would you like to remove?",
+				choices: roleList
+			}
+			const { role } = await prompt(questions);
+			q("DELETE FROM role WHERE ?",{id: role});
+		} catch (err) {
+			throw err;
+		};
 	},
 	allEmployees: async function(q) {
 		const employees = await q("SELECT * FROM employee");
 		console.table("All Employees", employees);
 	},
+	allDepartments: async function(q) {
+		const departments = await q("SELECT * FROM department");
+		console.table("All Departments", departments);
+	},
+	allRoles: async function(q) {
+		const roles = await q("SELECT * FROM role");
+		console.table("All Roles", roles);
+	},
+	updateRole: async function(q) {
+		var employeeList = await this.generateEmployees(q);
+		var roleList = await this.generateRoles(q);
+		try{
+			const questions = [
+			{
+				name: "employee",
+				type: "list",
+				message: "Which employee would you like to update?",
+				choices: employeeList
+			},
+			{
+				name: "role",
+				type: "list",
+				message: "What role would you like to assign them?",
+				choices: roleList
+			}];
+			const { employee, role } = await prompt(questions);
+			const { name: role_title } = await roleList.find(o => o.value === role);
+			q("UPDATE employee SET employee.role_id = ?, employee.role_title = ? WHERE employee.id = ? ",[role, role_title, employee]);
+		} catch (err) {
+			throw err;
+		};
+	},
+	updateManager: async function(q) {
+		var employeeList = await this.generateEmployees(q);
+		var managerList = await this.generateManagers(q);
+		try{const questions = [
+			{
+				name: "employee",
+				type: "list",
+				message: "Which employee would you like to update?",
+				choices: employeeList
+			},
+			{
+				name: "manager",
+				type: "list",
+				message: "Which manager would you like to assign them?",
+				choices: managerList
+			}];
+			const { employee, manager } = await prompt(questions);
+			q("UPDATE employee SET employee.manager_id = ? WHERE employee.id = ? ",[manager, employee]);
+		} catch (err) {
+			throw err;
+		}
+	},
+	// CANNOT FIGURE OUT HOW TO PULL OUT VALUE FROM RESPONSE.
+	// showBudget: async function(q) {
+	// 	try{
+	// 		const budget = await q("SELECT SUM(salary) FROM employee INNER JOIN role ON employee.role_id = role.id;");
+	// 	} catch (err) {
+	// 		throw err;
+	// 	};
+	// },
 }
-
-
-
 
 async function init() {
 	try{
@@ -116,12 +262,17 @@ async function runApp(query) {
 			message: "What would you like to do?",
 			choices: [
 				{value: 'allEmployees', name: "View all employees."},
-				{value: 'empByDepartment', name: "View employees by department."},
-				{value: 'empByManager', name: "View all employees by manager."},
+				{value: 'allDepartments', name: "View all departments."},
+				{value: 'allRoles', name: "View all roles."},
 				{value: 'addEmployee', name: "Add employee."},
+				{value: 'addDepartment', name: "Add department."},
+				{value: 'addRole', name: "Add role."},
 				{value: 'removeEmployee', name: "Remove employee."},
+				{value: 'removeDepartment', name: "Remove department."},
+				{value: 'removeRole', name: "Remove role."},
 				{value: 'updateRole', name: "Update an employees role."},
 				{value: 'updateManager', name: "Update an employees manager."},
+				{value: 'showBudget', name: "Show the budget by department."},
 			]
 		};
 		const { input } = await prompt(question);
@@ -133,7 +284,5 @@ async function runApp(query) {
 };
 
 
-// actions.generateRoles(queryAsync);
-// actions.generateManagers(queryAsync);
 
 init();
