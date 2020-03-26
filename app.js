@@ -26,7 +26,7 @@ const actions = {
 		return departmentValues;
 	},
 	generateManagers: async function (q) {
-		var managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title LIKE ?", ['%manager%']);
+		var managers = await q("SELECT id, first_name, last_name FROM employee WHERE role_title LIKE ? OR role_title LIKE ?", ['%manager%', '%CEO%']);
 		var managerValues = await managers.map(manager => {
 			const managerContainer = {};
 			managerContainer.value = manager.id;
@@ -212,6 +212,29 @@ const actions = {
 			throw err;
 		}
 	},
+	updateManager: async function(q) {
+		var employeeList = await this.generateEmployees(q);
+		var managerList = await this.generateManagers(q);
+		try{const questions = [
+			{
+				name: "employee",
+				type: "list",
+				message: "Which employee would you like to update?",
+				choices: employeeList
+			},
+			{
+				name: "manager",
+				type: "list",
+				message: "Which manager would you like to assign them?",
+				choices: managerList
+			},
+		];
+		const { employee, manager } = await prompt(questions);
+		q("UPDATE employee SET employee.manager_id = ? WHERE employee.id = ? ",[manager, employee]);
+		} catch (err) {
+			throw err;
+		}
+	},
 }
 
 async function init() {
@@ -252,10 +275,5 @@ async function runApp(query) {
 		throw err;
 	}
 };
-
-
-// actions.generateRoles(queryAsync);
-// actions.generateManagers(queryAsync);
-// actions.generateEmployees(queryAsync);
 
 init();
