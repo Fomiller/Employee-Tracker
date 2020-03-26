@@ -235,6 +235,13 @@ const actions = {
 			throw err;
 		}
 	},
+	// showBudget: async function(q) {
+	// 	try{
+	// 		const budget = await q("SELECT SUM(salary) FROM employee INNER JOIN role ON employee.role_id = role.id;");
+	// 	} catch (err) {
+	// 		throw err;
+	// 	};
+	// },
 }
 
 async function init() {
@@ -256,8 +263,6 @@ async function runApp(query) {
 				{value: 'allEmployees', name: "View all employees."},
 				{value: 'allDepartments', name: "View all departments."},
 				{value: 'allRoles', name: "View all roles."},
-				{value: 'empByDepartment', name: "View employees by department."},
-				{value: 'empByManager', name: "View all employees by manager."},
 				{value: 'addEmployee', name: "Add employee."},
 				{value: 'addDepartment', name: "Add department."},
 				{value: 'addRole', name: "Add role."},
@@ -266,6 +271,7 @@ async function runApp(query) {
 				{value: 'removeRole', name: "Remove role."},
 				{value: 'updateRole', name: "Update an employees role."},
 				{value: 'updateManager', name: "Update an employees manager."},
+				{value: 'showBudget', name: "Show the budget by department."},
 			]
 		};
 		const { input } = await prompt(question);
@@ -275,5 +281,7 @@ async function runApp(query) {
 		throw err;
 	}
 };
+
+
 
 init();
