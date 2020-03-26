@@ -64,11 +64,11 @@ INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Ralph
 
 -- INTERNS
 
-INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Timmy', 'Birch', 'Intern', 7);
-INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Jeremy', 'Oak', 'Intern', 7);
+INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Timmy', 'Birch', 'Intern', 8);
+INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Jeremy', 'Oak', 'Intern', 8);
 
-INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Jimmy', 'Oak', 'Intern', 8);
-INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Brody', 'Cedar', 'Intern', 8);
+INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Jimmy', 'Oak', 'Intern', 9);
+INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Brody', 'Cedar', 'Intern', 9);
 
-INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Pauly', 'Cedar', 'Intern', 9);
-INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Jeffery', 'Birch', 'Intern', 9);
+INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Pauly', 'Cedar', 'Intern', 10);
+INSERT INTO employee (first_name, last_name, role_title, role_id) VALUES ('Jeffery', 'Birch', 'Intern', 10);
