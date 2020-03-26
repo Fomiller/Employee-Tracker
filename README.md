@@ -17,7 +17,8 @@ Employee Tracker is a CLI database management tool that easily allows the user t
 
 ## Installation
 RUN npm install from the root folder.
-![Hot Restaurant Image](Assets/npmStart.PNG)
+
+![start script](Assets/npmStart.PNG)
 
 ## Usage
 Once the user has started the application they will be able to scroll through a list of prompts that will give them to ability to create and remove employees, roles, and departments.
