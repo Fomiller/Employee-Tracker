@@ -1,7 +1,7 @@
 const figlet = require("figlet")
 const text = {
     
-    writeText: () => {
+    writeText: async function() {
         figlet('Employee Tracker!!', {
             horizontalLayout: 'full',
         },function(err, data) {
