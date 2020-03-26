@@ -1,6 +1,5 @@
-const DB = require("./data/connection");
 var mysql = require("mysql");
-const figlet = require("./figlet.js");
+const figlet = require("./figlet.js")
 const { prompt } = require("inquirer");
 const util = require("util");
 const connection = mysql.createConnection({
@@ -13,7 +12,6 @@ const connection = mysql.createConnection({
 const connectAsync = util.promisify(connection.connect).bind(connection);
 const queryAsync = util.promisify(connection.query).bind(connection);
 // figlet.writeText();
-
 const actions = {
 	generateDepartments: async function (q) {
 		const departments = await q("SELECT * FROM department");
@@ -83,12 +81,14 @@ const actions = {
 					choices: managerList
 				}
 			];
+			// deconstruct answers from inquirer
 			const { firstName, lastName, role, manager,} = await prompt(questions);
+			// .find() the matching name to role and pass to the employee
 			const { name: role_title } = await roleList.find(o => o.value === role);
 			q("INSERT INTO employee SET ?",{first_name: firstName, last_name: lastName, role_title: role_title, role_id: role, manager_id: manager});
 		} catch (err) {
 			throw err;
-		}
+		};
 	},
 	addDepartment: async function (q) {
 		try{
@@ -101,7 +101,7 @@ const actions = {
 			q("INSERT INTO department SET ?",{name: department});
 		} catch (err) {
 			throw err;
-		}
+		};
 	},
 	addRole: async function (q) {
 		var departmentList = await this.generateDepartments(q);
@@ -128,7 +128,7 @@ const actions = {
 			q("INSERT INTO role SET ?",{title: title, salary: salary, department_id: department});
 		} catch (err) {
 			throw err;
-		}
+		};
 	},
 	removeEmployee: async function (q) {
 		var employeeList = await this.generateEmployees(q);
@@ -143,7 +143,7 @@ const actions = {
 			q("DELETE FROM employee WHERE ?",{ id: employee});
 		} catch (err) {
 			throw err;
-		}
+		};
 	},
 	removeDepartment: async function (q) {
 		var departmentList = await this.generateDepartments(q);
@@ -190,7 +190,8 @@ const actions = {
 	updateRole: async function(q) {
 		var employeeList = await this.generateEmployees(q);
 		var roleList = await this.generateRoles(q);
-		try{const questions = [
+		try{
+			const questions = [
 			{
 				name: "employee",
 				type: "list",
@@ -202,15 +203,13 @@ const actions = {
 				type: "list",
 				message: "What role would you like to assign them?",
 				choices: roleList
-			},
-		];
-		const { employee, role } = await prompt(questions);
-		const { name: role_title } = await roleList.find(o => o.value === role);
-		q("UPDATE employee SET employee.role_id = ?, employee.role_title = ? WHERE employee.id = ? ",[role, role_title, employee]);
-
+			}];
+			const { employee, role } = await prompt(questions);
+			const { name: role_title } = await roleList.find(o => o.value === role);
+			q("UPDATE employee SET employee.role_id = ?, employee.role_title = ? WHERE employee.id = ? ",[role, role_title, employee]);
 		} catch (err) {
 			throw err;
-		}
+		};
 	},
 	updateManager: async function(q) {
 		var employeeList = await this.generateEmployees(q);
@@ -227,14 +226,14 @@ const actions = {
 				type: "list",
 				message: "Which manager would you like to assign them?",
 				choices: managerList
-			},
-		];
-		const { employee, manager } = await prompt(questions);
-		q("UPDATE employee SET employee.manager_id = ? WHERE employee.id = ? ",[manager, employee]);
+			}];
+			const { employee, manager } = await prompt(questions);
+			q("UPDATE employee SET employee.manager_id = ? WHERE employee.id = ? ",[manager, employee]);
 		} catch (err) {
 			throw err;
 		}
 	},
+	// CANNOT FIGURE OUT HOW TO PULL OUT VALUE FROM RESPONSE.
 	// showBudget: async function(q) {
 	// 	try{
 	// 		const budget = await q("SELECT SUM(salary) FROM employee INNER JOIN role ON employee.role_id = role.id;");
