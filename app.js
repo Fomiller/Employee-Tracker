@@ -10,6 +10,7 @@ const connection = mysql.createConnection({
     password: "527996",
     database: "company_db"
 });
+
 const connectAsync = util.promisify(connection.connect).bind(connection);
 const queryAsync = util.promisify(connection.query).bind(connection);
 // figlet.writeText();
