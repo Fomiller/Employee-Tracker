@@ -187,6 +187,31 @@ const actions = {
 		const roles = await q("SELECT * FROM role");
 		console.table("All Roles", roles);
 	},
+	updateRole: async function(q) {
+		var employeeList = await this.generateEmployees(q);
+		var roleList = await this.generateRoles(q);
+		try{const questions = [
+			{
+				name: "employee",
+				type: "list",
+				message: "Which employee would you like to update?",
+				choices: employeeList
+			},
+			{
+				name: "role",
+				type: "list",
+				message: "What role would you like to assign them?",
+				choices: roleList
+			},
+		];
+		const { employee, role } = await prompt(questions);
+		const { name: role_title } = await roleList.find(o => o.value === role);
+		q("UPDATE employee SET employee.role_id = ?, employee.role_title = ? WHERE employee.id = ? ",[role, role_title, employee]);
+
+		} catch (err) {
+			throw err;
+		}
+	},
 }
 
 async function init() {
