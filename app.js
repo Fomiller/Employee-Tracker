@@ -10,10 +10,6 @@ const connection = mysql.createConnection({
     password: "527996",
     database: "company_db"
 });
-// connection.connect(function(err) {
-//     if (err) throw err;
-//     console.log("connected as id" + connection.threadId + "\n");
-// })
 const connectAsync = util.promisify(connection.connect).bind(connection);
 const queryAsync = util.promisify(connection.query).bind(connection);
 // figlet.writeText();
