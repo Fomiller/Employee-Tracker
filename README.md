@@ -1,5 +1,6 @@
 
 # Employee Tracker
+![Commits](https://img.shields.io/github/last-commit/Fomiller/https://github.com/Fomiller/Employee-Tracker) 
  
 ## Languages
 ![JavaScript](https://img.shields.io/badge/language-JavaScript-orange)&ensp;![Node.js](https://img.shields.io/badge/language-Node.js-brightgreen)&ensp;
